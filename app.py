@@ -6,46 +6,25 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import os
 import urllib.request
-
-# -------------------------------
-# 1️⃣ Streamlit page config
-# -------------------------------
 st.set_page_config(layout="wide", page_title="Crowd-Flow Fairness")
 st.title("🧭 Crowd-Flow Fairness Predictor")
 st.write("Predict hourly footfall and get the best visiting time recommendations.")
-
-# -------------------------------
-# 2️⃣ Download model & preprocessor if missing
-# -------------------------------
 MODEL_URL = "https://github.com/DarshiniSivakumar/CROWD_FLOW_FAIRNESS_PROJECT/raw/main/crowd_model.pkl"
 PREPROC_URL = "https://github.com/DarshiniSivakumar/CROWD_FLOW_FAIRNESS_PROJECT/raw/main/preprocessor.pkl"
-
 if not os.path.exists("crowd_model.pkl"):
     urllib.request.urlretrieve(MODEL_URL, "crowd_model.pkl")
 if not os.path.exists("preprocessor.pkl"):
     urllib.request.urlretrieve(PREPROC_URL, "preprocessor.pkl")
-
-# -------------------------------
-# 3️⃣ Load model & preprocessor
-# -------------------------------
 model = joblib.load("crowd_model.pkl")
 preproc = joblib.load("preprocessor.pkl")
 le_place = preproc["le_place"]
 le_city = preproc["le_city"]
 FEATURES = preproc["features"]
-
-# -------------------------------
-# 4️⃣ TN Cities list
-# -------------------------------
 tn_cities = [
     "Chennai","Coimbatore","Madurai","Tiruchirappalli","Salem","Erode","Tirunelveli",
     "Vellore","Tiruppur","Thoothukudi","Karur","Nagercoil","Cuddalore","Dindigul",
     "Kanchipuram","Kanyakumari","Sivakasi","Pollachi","Ramanathapuram","Villupuram"
 ]
-
-# -------------------------------
-# 5️⃣ Sidebar inputs
-# -------------------------------
 with st.sidebar:
     st.header("Input Conditions")
     place_type = st.selectbox("Place type", sorted(list(le_place.classes_)))
@@ -62,27 +41,19 @@ with st.sidebar:
     event_density = st.slider("Event density (0 none - 1 heavy)", 0.0, 1.0, 0.0, 0.1)
     date = st.date_input("Date", datetime.today())
     hour = st.slider("Hour (0–23)", 0, 23, datetime.now().hour)
-
 if not city:
     st.sidebar.error("Please enter or select a city.")
     st.stop()
-
-# -------------------------------
-# 6️⃣ Date features
-# -------------------------------
 day = date.day
 month = date.month
 dayofweek = date.weekday()
-
 def safe_transform_label(le, val):
     try:
         return int(le.transform([val])[0])
     except Exception:
-        return 0
-
+        return 0  # unseen labels default to 0
 place_code = safe_transform_label(le_place, place_type)
 city_code = safe_transform_label(le_city, city)
-
 input_row = pd.DataFrame([{
     "place_code": place_code,
     "city_code": city_code,
@@ -95,19 +66,12 @@ input_row = pd.DataFrame([{
     "dayofweek": dayofweek,
     "event_density": event_density
 }])
-
-# -------------------------------
-# 6.1 Ensure input matches model features
-# -------------------------------
-for col in FEATURES:
-    if col not in input_row.columns:
-        input_row[col] = 0  # default value
-
-# -------------------------------
-# 7️⃣ Predict Now
-# -------------------------------
 st.subheader("Predict Now")
 if st.button("Predict Crowd"):
+    # Ensure input columns match training features
+    missing_cols = [c for c in FEATURES if c not in input_row.columns]
+    for c in missing_cols:
+        input_row[c] = 0
     base_pred = int(model.predict(input_row[FEATURES])[0])
     adj_factor = 1.0
     reasons = []
@@ -132,16 +96,11 @@ if st.button("Predict Crowd"):
         cat = "🟡 Fair"
     else:
         cat = "🟢 Low"
-
     st.markdown(f"### 📍 {place_type.title()} — {city}{' / '+location if location else ''}")
     st.metric("Estimated footfall", f"{final_pred} people")
     st.markdown(f"**Category:** {cat}")
     if reasons:
         st.info("Factors: " + ", ".join(reasons))
-
-# -------------------------------
-# 8️⃣ Full-day forecast
-# -------------------------------
 st.header("Full-day forecast & best visiting window")
 if st.button("Show 24-hour Forecast"):
     hours = list(range(24))
@@ -160,11 +119,9 @@ if st.button("Show 24-hour Forecast"):
             "event_density": event_density
         })
     df_in = pd.DataFrame(rows)
-
-    # Ensure full-day input matches model features
-    for col in FEATURES:
-        if col not in df_in.columns:
-            df_in[col] = 0
+    missing_cols = [c for c in FEATURES if c not in df_in.columns]
+    for c in missing_cols:
+        df_in[c] = 0
 
     preds = model.predict(df_in[FEATURES])
     adj_preds = []
@@ -179,7 +136,6 @@ if st.button("Show 24-hour Forecast"):
         if rain > 5 and place_type in ["beach","tourist_spot","park"]:
             a *= 0.6
         adj_preds.append(int(max(0, val * a)))
-
     p25 = np.percentile(adj_preds, 25)
     p75 = np.percentile(adj_preds, 75)
     peak_hours = [i for i,v in enumerate(adj_preds) if v > p75]
@@ -187,12 +143,10 @@ if st.button("Show 24-hour Forecast"):
     low_hours = [i for i,v in enumerate(adj_preds) if v < p25]
     best_hour = int(np.argmin(adj_preds))
     reduction = (max(adj_preds) - min(adj_preds)) / max(1, max(adj_preds)) * 100
-
     st.success(f"⭐ Best visiting hour: {best_hour}:00  — expected crowd reduction vs peak: {reduction:.1f}%")
     st.write("Peak hours:", ", ".join(map(str, peak_hours)))
     st.write("Fair hours:", ", ".join(map(str, fair_hours)))
     st.write("Low hours:", ", ".join(map(str, low_hours)))
-
     chart_df = pd.DataFrame({"Hour": hours, "Predicted Crowd": adj_preds}).set_index("Hour")
     st.line_chart(chart_df)
 
