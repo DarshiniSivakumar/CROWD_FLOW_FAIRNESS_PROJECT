@@ -97,6 +97,13 @@ input_row = pd.DataFrame([{
 }])
 
 # -------------------------------
+# 6.1 Ensure input matches model features
+# -------------------------------
+for col in FEATURES:
+    if col not in input_row.columns:
+        input_row[col] = 0  # default value
+
+# -------------------------------
 # 7️⃣ Predict Now
 # -------------------------------
 st.subheader("Predict Now")
@@ -153,6 +160,12 @@ if st.button("Show 24-hour Forecast"):
             "event_density": event_density
         })
     df_in = pd.DataFrame(rows)
+
+    # Ensure full-day input matches model features
+    for col in FEATURES:
+        if col not in df_in.columns:
+            df_in[col] = 0
+
     preds = model.predict(df_in[FEATURES])
     adj_preds = []
     for h,val in enumerate(preds):
