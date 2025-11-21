@@ -4,19 +4,48 @@ import numpy as np
 import joblib
 from datetime import datetime
 import matplotlib.pyplot as plt
+import os
+import urllib.request
+
+# -------------------------------
+# 1️⃣ Streamlit page config
+# -------------------------------
 st.set_page_config(layout="wide", page_title="Crowd-Flow Fairness")
 st.title("🧭 Crowd-Flow Fairness Predictor")
 st.write("Predict hourly footfall and get the best visiting time recommendations.")
+
+# -------------------------------
+# 2️⃣ Download model & preprocessor if missing
+# -------------------------------
+MODEL_URL = "https://github.com/DarshiniSivakumar/CROWD_FLOW_FAIRNESS_PROJECT/raw/main/crowd_model.pkl"
+PREPROC_URL = "https://github.com/DarshiniSivakumar/CROWD_FLOW_FAIRNESS_PROJECT/raw/main/preprocessor.pkl"
+
+if not os.path.exists("crowd_model.pkl"):
+    urllib.request.urlretrieve(MODEL_URL, "crowd_model.pkl")
+if not os.path.exists("preprocessor.pkl"):
+    urllib.request.urlretrieve(PREPROC_URL, "preprocessor.pkl")
+
+# -------------------------------
+# 3️⃣ Load model & preprocessor
+# -------------------------------
 model = joblib.load("crowd_model.pkl")
 preproc = joblib.load("preprocessor.pkl")
 le_place = preproc["le_place"]
 le_city = preproc["le_city"]
 FEATURES = preproc["features"]
+
+# -------------------------------
+# 4️⃣ TN Cities list
+# -------------------------------
 tn_cities = [
     "Chennai","Coimbatore","Madurai","Tiruchirappalli","Salem","Erode","Tirunelveli",
     "Vellore","Tiruppur","Thoothukudi","Karur","Nagercoil","Cuddalore","Dindigul",
     "Kanchipuram","Kanyakumari","Sivakasi","Pollachi","Ramanathapuram","Villupuram"
 ]
+
+# -------------------------------
+# 5️⃣ Sidebar inputs
+# -------------------------------
 with st.sidebar:
     st.header("Input Conditions")
     place_type = st.selectbox("Place type", sorted(list(le_place.classes_)))
@@ -33,19 +62,27 @@ with st.sidebar:
     event_density = st.slider("Event density (0 none - 1 heavy)", 0.0, 1.0, 0.0, 0.1)
     date = st.date_input("Date", datetime.today())
     hour = st.slider("Hour (0–23)", 0, 23, datetime.now().hour)
+
 if not city:
     st.sidebar.error("Please enter or select a city.")
     st.stop()
+
+# -------------------------------
+# 6️⃣ Date features
+# -------------------------------
 day = date.day
 month = date.month
 dayofweek = date.weekday()
+
 def safe_transform_label(le, val):
     try:
         return int(le.transform([val])[0])
     except Exception:
         return 0
+
 place_code = safe_transform_label(le_place, place_type)
 city_code = safe_transform_label(le_city, city)
+
 input_row = pd.DataFrame([{
     "place_code": place_code,
     "city_code": city_code,
@@ -58,6 +95,10 @@ input_row = pd.DataFrame([{
     "dayofweek": dayofweek,
     "event_density": event_density
 }])
+
+# -------------------------------
+# 7️⃣ Predict Now
+# -------------------------------
 st.subheader("Predict Now")
 if st.button("Predict Crowd"):
     base_pred = int(model.predict(input_row[FEATURES])[0])
@@ -90,6 +131,10 @@ if st.button("Predict Crowd"):
     st.markdown(f"**Category:** {cat}")
     if reasons:
         st.info("Factors: " + ", ".join(reasons))
+
+# -------------------------------
+# 8️⃣ Full-day forecast
+# -------------------------------
 st.header("Full-day forecast & best visiting window")
 if st.button("Show 24-hour Forecast"):
     hours = list(range(24))
@@ -140,4 +185,3 @@ if st.button("Show 24-hour Forecast"):
 
     st.write("---")
     st.write("Note: Predictions use ML baseline × rule-based adjustments (city/event/weather/time).")
-
