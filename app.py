@@ -8,9 +8,6 @@ import urllib.request
 st.set_page_config(layout="wide", page_title="Crowd-Flow Fairness")
 st.title("🧭 Crowd-Flow Fairness Predictor")
 st.write("Predict hourly footfall and get the best visiting time recommendations.")
-st.set_page_config(layout="wide", page_title="Crowd-Flow Fairness")
-st.title("🧭 Crowd-Flow Fairness Predictor")
-st.write("Predict hourly footfall and get the best visiting time recommendations.")
 MODEL_URL = "https://github.com/DarshiniSivakumar/CROWD_FLOW_FAIRNESS_PROJECT/raw/main/crowd_model.pkl"
 PREPROC_URL = "https://github.com/DarshiniSivakumar/CROWD_FLOW_FAIRNESS_PROJECT/raw/main/preprocessor.pkl"
 if not os.path.exists("crowd_model.pkl"):
@@ -160,3 +157,4 @@ if st.button("Show 24-hour Forecast"):
     st.line_chart(chart_df)
     st.write("---")
     st.write("Note: Predictions use ML baseline × rule-based adjustments (city/event/weather/time).")
+
