@@ -10,7 +10,6 @@ le_place = LabelEncoder()
 le_city = LabelEncoder()
 df["place_code"] = le_place.fit_transform(df["place_type"])
 df["city_code"] = le_city.fit_transform(df["city"])
-
 FEATURES = [
     "place_code", "city_code", "temp_celsius", "rain_1h",
     "clouds_all", "day", "hour", "month", "dayofweek", "event_density"
@@ -27,3 +26,4 @@ joblib.dump(model, "crowd_model.pkl")
 preproc = {"le_place": le_place, "le_city": le_city, "features": FEATURES}
 joblib.dump(preproc, "preprocessor.pkl")
 print("Saved crowd_model.pkl and preprocessor.pkl")
+
