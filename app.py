@@ -50,7 +50,7 @@ def safe_transform_label(le, val):
     try:
         return int(le.transform([val])[0])
     except Exception:
-        return 0  # unseen labels default to 0
+        return 0  
 place_code = safe_transform_label(le_place, place_type)
 city_code = safe_transform_label(le_city, city)
 input_row = pd.DataFrame([{
@@ -157,4 +157,3 @@ if st.button("Show 24-hour Forecast"):
     st.line_chart(chart_df)
     st.write("---")
     st.write("Note: Predictions use ML baseline × rule-based adjustments (city/event/weather/time).")
-
