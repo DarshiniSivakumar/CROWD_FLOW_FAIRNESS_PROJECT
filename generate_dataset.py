@@ -2,29 +2,21 @@ import random
 from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
-
 random.seed(42)
 np.random.seed(42)
-
-
 place_types = [
     "mall", "metro_station", "bus_stop", "railway_station",
     "temple", "tourist_spot", "college", "hospital", "theater", "park", "stadium"
 ]
-
 tn_cities = [
     "Chennai","Coimbatore","Madurai","Tiruchirappalli","Salem","Erode","Tirunelveli",
     "Vellore","Tiruppur","Thoothukudi","Karur","Nagercoil","Cuddalore","Dindigul",
     "Kanchipuram","Kanyakumari","Sivakasi","Pollachi","Ramanathapuram","Villupuram"
 ]
-
 uploaded_zip = "/mnt/data/metro+interstate+traffic+volume (2).zip"
-
 N = 20000  
-
 rows = []
 start_date = datetime(2024,1,1)
-
 def base_by_type(ptype, hour, dow):
     if ptype in ["metro_station", "railway_station", "bus_stop"]:
         base = 3000 * (1 + 0.9 * (7 <= hour <= 9 or 17 <= hour <= 19))
@@ -65,7 +57,6 @@ for i in range(N):
     rain = max(0.0, np.random.exponential(scale=1.5) * (2.0 if month in [6,7,8,9] else 1.0))
     clouds = int(np.clip(np.random.normal(40, 30), 0, 100))
     event_density = float(np.random.choice([0,0,0,0.2,0.5,1.0], p=[0.6,0.15,0.1,0.08,0.05,0.02]))
-
     base = base_by_type(ptype, hour, dow)
     weather_factor = 1.0
     if rain > 10 and ptype in ["beach","tourist_spot","park"]:
@@ -74,7 +65,6 @@ for i in range(N):
         weather_factor *= 0.9
     if temp > 38 and ptype in ["beach","park"]:
         weather_factor *= 0.85
-
     crowd = int(max(0, base * (1 + event_density) * weather_factor + np.random.normal(0, base*0.15)))
     rows.append({
         "city": city,
@@ -91,8 +81,8 @@ for i in range(N):
         "event_density": event_density,
         "footfall": crowd
     })
-
 df = pd.DataFrame(rows)
 df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 df.to_csv("india_tn_crowd.csv", index=False)
 print("Saved india_tn_crowd.csv with", len(df), "rows")
+
