@@ -11,20 +11,20 @@ This project predicts hourly crowd levels across public places in Tamil Nadu and
 -A Random Forest model is used along with custom preprocessing.
 
 ### Live Demo
-- Streamlit App:
+Streamlit App:
 https://crowdflowfairnessproject-obh6nsij9tsyrzh4gigvwe.streamlit.app/
 
-### How the System Works
+## How the System Works
 
-## 1. Dataset Creation
--Synthetic but realistic Tamil Nadu crowd data was generated using:
+### 1. Dataset Creation
+Synthetic but realistic Tamil Nadu crowd data was generated using:
 -Weather attributes
 -Hour/day/month patterns
 -Place categories
 -Event density
 **File:** india_tn_crowd.csv
 
-## 2. Model Training
+### 2. Model Training
 A Random Forest Regressor is trained using the following features:
 -Feature	Purpose
 -place_code	Encoded place type
@@ -38,7 +38,7 @@ A Random Forest Regressor is trained using the following features:
 -crowd_model.pkl
 -preprocessor.pkl
 
-## 3. Streamlit Web App
+### 3. Streamlit Web App
 The interface (app.py) includes:
 -Real-time crowd prediction
 -Full day forecast
@@ -46,8 +46,8 @@ The interface (app.py) includes:
 -Fairness evaluation across categories
 -Clean visual insights
 
-### Key Feature Explanations
-## Event Density
+## Key Feature Explanations
+### Event Density
 A numerical factor indicating:
 -Festivals
 -Local events
@@ -55,12 +55,12 @@ A numerical factor indicating:
 -Special occasions
 This helps the model simulate realistic spikes in footfall.
 
-## Cloud Coverage
--% of sky covered by clouds (0–100)
+### Cloud Coverage
+% of sky covered by clouds (0–100)
 -Impacts outdoor crowd behaviour
 -These descriptions are added in the README because they explain why these features are part of the model, not because users need to enter them manually.
 
-### Repository Structure
+## Repository Structure
 app.py                          # Streamlit interface
 train_model.py                  # Model training script
 generate_dataset.py             # Synthetic data generator
@@ -74,10 +74,10 @@ CrowdFlowFairness_Project.ipynb # Notebook with initial analysis and steps
 Metro_Interstate_Traffic_Volume.csv # Reference dataset (not used in app)
 README.md
 
-### Additional Clarifications
+## Additional Clarifications
 CrowdFlowFairness_Project.ipynb-Contains initial exploratory analysis, testing, and step-by-step development.
 
-## Files used directly in the Streamlit app
+### Files used directly in the Streamlit app
 train_model.py
 generate_dataset.py
 app.py
@@ -86,13 +86,13 @@ preprocessor.pkl
 crowd_model.pkl
 india_tn_crowd.csv
 
-## Other files
+### Other files
 crowd_model.py, crowd_rules.py → Helper logic
 Metro_Interstate_Traffic_Volume.csv → Reference dataset used earlier in testing (not required for the app)
 
-### Running Locally
+## Running Locally
 -pip install -r requirements.txt
 -streamlit run app.py
 
-### Author
+## Author
 Darshini Sivakumar
