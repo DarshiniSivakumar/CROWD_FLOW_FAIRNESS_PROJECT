@@ -61,37 +61,37 @@ This helps the model simulate realistic spikes in footfall.
 -These descriptions are added in the README because they explain why these features are part of the model, not because users need to enter them manually.
 
 ## Repository Structure
-app.py                          # Streamlit interface
-train_model.py                  # Model training script
-generate_dataset.py             # Synthetic data generator
-crowd_model.py                  # Model wrapper functions
-crowd_rules.py                  # Simple rule-based checks
-india_tn_crowd.csv              # Final dataset
-crowd_model.pkl                 # Trained ML model
-preprocessor.pkl                # Encoders & feature transformers
-requirements.txt                # Python dependencies
-CrowdFlowFairness_Project.ipynb # Notebook with initial analysis and steps
-Metro_Interstate_Traffic_Volume.csv # Reference dataset (not used in app)
+app.py                    -     # Streamlit interface,
+train_model.py            -      # Model training script,
+generate_dataset.py       -     # Synthetic data generator,
+crowd_model.py            -      # Model wrapper functions,
+crowd_rules.py            -      # Simple rule-based checks,
+india_tn_crowd.csv        -      # Final dataset,
+crowd_model.pkl           -      # Trained ML model,
+preprocessor.pkl          -     # Encoders & feature transformers,
+requirements.txt          -      # Python dependencies,
+CrowdFlowFairness_Project.ipynb - # Notebook with initial analysis and steps,
+Metro_Interstate_Traffic_Volume.csv - # Reference dataset (not used in app),
 README.md
 
 ## Additional Clarifications
 CrowdFlowFairness_Project.ipynb-Contains initial exploratory analysis, testing, and step-by-step development.
 
 ### Files used directly in the Streamlit app
-train_model.py
-generate_dataset.py
-app.py
-requirements.txt
-preprocessor.pkl
-crowd_model.pkl
-india_tn_crowd.csv
+train_model.py,
+generate_dataset.py,
+app.py,
+requirements.txt,
+preprocessor.pkl,
+crowd_model.pkl,
+india_tn_crowd.csv.
 
 ### Other files
-crowd_model.py, crowd_rules.py → Helper logic
+crowd_model.py, crowd_rules.py → Helper logic,
 Metro_Interstate_Traffic_Volume.csv → Reference dataset used earlier in testing (not required for the app)
 
 ## Running Locally
--pip install -r requirements.txt
+-pip install -r requirements.txt,
 -streamlit run app.py
 
 ## Author
